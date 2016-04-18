@@ -10,6 +10,7 @@ class Person
   end
 
   def shout(message)
+    deduct_credits(message)
     @network.broadcast(message, self)
   end
 
@@ -17,22 +18,33 @@ class Person
     messages_heard << message
   end
 
+
+  private
+
+    def deduct_credits(message)
+      if message.length > 180
+        @credits -= 2
+      end
+      message.scan(/buy/i).each do
+        @credits -= 5
+      end
+    end
+
 end
 
 class Network
   def initialize(range)
     @range = range
+    @listeners = []
   end
 
   def subscribe(listener)
-    @listeners ||= []
     @listeners << listener
   end
 
   def broadcast(message, shouter)
     shouter_location = shouter.location
     short_enough = message.length <= 180
-    deduct_credits(short_enough, message, shouter)
 
     @listeners.each do |listener|
       within_range = (listener.location - shouter_location).abs <= @range
@@ -42,14 +54,5 @@ class Network
       end
     end
   end
-
-  private
-
-    def deduct_credits(short_enough, message, shouter)
-      shouter.credits -= 2 if !short_enough
-      message.scan(/buy/i).each do
-        shouter.credits -= 5
-      end
-    end
 
 end

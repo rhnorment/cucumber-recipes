@@ -29,4 +29,17 @@ describe Person do
 		lucy.hear(message)
 		expect(lucy.messages_heard).to eql([message])
 	end
+
+	describe 'charging for shouts' do
+		it "deducts 5 credits when the shouter mentions the word 'buy'" do
+			sean = Person.new(network, 0)
+			sean.credits = 100
+			sean.shout("here is a message containing the word buy")
+			expect(sean.credits).to eql(95)
+		end
+
+		it 'deducts 2 credits when the message is over 180 characters'
+	end
 end
+
+# 9:05 left
