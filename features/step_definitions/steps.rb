@@ -27,7 +27,6 @@ When(/^Sean shouts (\d+) over\-long messages$/) do |num|
 	end
 end
 
-
 When(/^Sean shouts a over-long messsage$/) do
 	message = "x" * 181
 	sean_shout(message)
@@ -43,6 +42,11 @@ When(/^Sean shouts a message containg the word "(.*?)"$/) do |word|
 	sean_shout(message)
 end
 
+When(/^Sean shouts a message containing the word "([^"]*)"$/) do |word|
+ 	message = "A message containing the word #{word}"
+	sean_shout(message)
+end
+
 When(/^Sean shouts "(.*?)"$/) do |message|
 	sean_shout(message)
 end
@@ -55,8 +59,8 @@ Then(/^Lucy hears Sean's message$/) do
   	expect(people['Lucy'].messages_heard).to include(messages_shouted_by['Sean'].last)
 end
 
-Then(/^Larry does not hear Sean's message$/) do
-	expect(people['Larry'].messages_heard).to_not include(messages_shouted_by['Sean'].last)
+Then(/^(Larry|Lucy) does not hear Sean's message$/) do |listener_name|
+	expect(people[listener_name].messages_heard).to_not include(messages_shouted_by['Sean'].last)
 end
 
 Then(/^nobody hears Sean's message$/) do

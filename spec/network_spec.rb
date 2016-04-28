@@ -34,21 +34,9 @@ describe Network do
 			end
 
 			it 'does not error when broadcasting with nobody listening' do
-				sean = double(location: 0, credits: 100)
+				sean = double(location: 0)
 				expect { network.broadcast(message, sean) }.to_not raise_error
-			end
-
-			it 'does not broadcast messages over 180 characters when the shouter cannot afford to pay' do
 			end
 		end
 	end
-
-	xit 'does not broadcast a message over 180 characters even when the listener is in range' do
-				sean = double(location: 0, credits: -1).as_null_object  # hack to keep specs passing
-				long_message = "x" * 181
-				lucy = double(location: 100)
-				network.subscribe(lucy)
-				expect(lucy).to_not receive(:hear)
-				network.broadcast(long_message, sean)
-			end	
 end

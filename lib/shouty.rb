@@ -10,6 +10,8 @@ class Person
   end
 
   def shout(message)
+    return unless can_afford?(message)
+
     deduct_credits(message)
     @network.broadcast(message, self)
   end
@@ -21,15 +23,24 @@ class Person
 
   private
 
-    def deduct_credits(message)
-      if message.length > 180
-        @credits -= 2
-      end
-      message.scan(/buy/i).each do
-        @credits -= 5
-      end
+    def can_afford?(message)
+      cost_of(message) <= @credits
     end
 
+    def deduct_credits(message)
+      @credits -= cost_of(message)
+    end
+
+    def cost_of(message)
+      cost = 0
+      if message.length > 180
+        cost += 2
+      end
+      if message.match(/buy/i)
+        cost += 5
+      end
+      cost
+    end
 end
 
 class Network
@@ -43,16 +54,16 @@ class Network
   end
 
   def broadcast(message, shouter)
-    shouter_location = shouter.location
-    short_enough = message.length <= 180
-
-    @listeners.each do |listener|
-      within_range = (listener.location - shouter_location).abs <= @range
-      
-      if (within_range && (short_enough || (shouter.credits >= 0)))
-      	listener.hear(message)
-      end
+    listeners_within_range_of(shouter).each do |listener|
+      listener.hear(message)
     end
   end
 
+  private
+
+    def listeners_within_range_of(shouter)
+      @listeners.select do |listener|
+        (listener.location - shouter.location).abs <= @range
+      end
+    end
 end

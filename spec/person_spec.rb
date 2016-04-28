@@ -38,8 +38,30 @@ describe Person do
 			expect(sean.credits).to eql(95)
 		end
 
-		it 'deducts 2 credits when the message is over 180 characters'
+		it 'only charges once per shout for multiple mentions of buy' do
+			sean = Person.new(network, 0)
+			sean.credits = 100
+			sean.shout("buy buy buy")
+			expect(sean.credits).to eql(95)
+		end
+
+		it 'deducts 2 credits when the message is over 180 characters' do
+			sean = Person.new(network, 0)
+			sean.credits = 100
+			sean.shout("x" * 181)
+			expect(sean.credits).to eql(98)
+		end
 	end
+
+	describe 'broadcasting shouts' do
+		it 'does not broadcast messages over 180 characters when the shouter has insufficient credits' do
+			sean = Person.new(network, 0)
+			sean.credits = 1
+			expect(network).to_not receive(:broadcast)
+			sean.shout("x" * 181)
+		end
+	end
+
+
 end
 
-# 9:05 left
